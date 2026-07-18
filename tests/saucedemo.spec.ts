@@ -1,5 +1,12 @@
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.goto('https://www.saucedemo.com/');
+  await page.getByPlaceholder('Username').fill('standard_user');
+  await page.getByPlaceholder('Password').fill('secret_sauce');
+  await page.getByRole('button', { name: 'Login' }).click();
+});
+
 test('has title', async ({ page }) => {
 
     await page.goto('https://www.saucedemo.com/');
@@ -24,8 +31,19 @@ test('adding to cart', async ({ page }) => {
     await page.getByPlaceholder('Password').fill('secret_sauce');
     await page.getByRole('button', { name: 'Login' }).click();
     await expect(page).toHaveURL(/inventory\.html/);
-    await page.getByRole('link', { name: 'Sauce Labs Backpack' }).click();
+    await page.getByRole('link', { name: 'Sauce Labs Backpack' }).first().click();
     await page.locator('[data-test="add-to-cart"]').click();
-    await expect(page.locator('.shopping_cart_badge')).toHaveText('1');
+    await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('1');
 
 });
+
+test('adding two products to cart', async ({ page }) => {
+
+    await page.getByRole('link', { name: 'Sauce Labs Backpack' }).first().click();
+    await page.locator('[data-test="add-to-cart"]').click();
+    await page.locator('[data-test="back-to-products"]').click();
+    await page.getByRole('link', { name: 'Sauce Labs Bike Light' }).first().click();
+    await page.locator('[data-test="add-to-cart"]').click();
+    await expect(page.locator('[data-test="shopping-cart-badge"]')).toHaveText('2');
+
+});    
